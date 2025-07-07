@@ -1,20 +1,23 @@
-import clientPromise from '@/lib/mongodb';
+import { connectDB } from "@/lib/db";
+import Trade from "@/models/Trade";
 
 export async function POST(req) {
   try {
+    await connectDB();
     const body = await req.json();
-    const client = await clientPromise;
-    const db = client.db(); // defaults to DB in URI
-    const collection = db.collection('trades');
-
-    const result = await collection.insertOne(body);
-    return new Response(JSON.stringify({ success: true, id: result.insertedId }), {
-      status: 201,
-    });
+    const trade = await Trade.create(body);
+    return Response.json({ success: true, trade });
   } catch (error) {
-    console.error('Trade save error:', error);
-    return new Response(JSON.stringify({ success: false, error: 'Failed to save trade' }), {
-      status: 500,
-    });
+    return Response.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    await connectDB();
+    const trades = await Trade.find().sort({ createdAt: -1 });
+    return Response.json(trades);
+  } catch (error) {
+    return Response.json({ success: false, error: error.message }, { status: 500 });
   }
 }

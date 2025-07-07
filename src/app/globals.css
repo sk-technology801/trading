@@ -3,5 +3,38 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gradient-to-br from-[#0c0f2f] to-black text-white;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #0f0f0f;
+  color: white;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+}
+.glitch {
+  position: relative;
+  color: white;
+  animation: glitch 1.5s infinite;
+}
+@keyframes glitch {
+  0% {
+    text-shadow: 1px 0 red, -1px 0 cyan;
+  }
+  20% {
+    text-shadow: -2px 1px red, 2px -1px cyan;
+  }
+  40% {
+    text-shadow: 1px -1px red, -1px 1px cyan;
+  }
+  60% {
+    text-shadow: -1px 0 red, 1px 0 cyan;
+  }
+  80% {
+    text-shadow: 2px 2px red, -2px -2px cyan;
+  }
+  100% {
+    text-shadow: 1px 0 red, -1px 0 cyan;
+  }
 }

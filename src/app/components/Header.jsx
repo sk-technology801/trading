@@ -1,90 +1,77 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+<Link href="/portfolio" className="hover:underline">Portfolio</Link>
 
-const navLinks = ['Markets', 'Trade', 'Portfolio', 'News'];
+const coins = ["BTC", "ETH", "SOL", "ADA", "XRP"];
+const dummyPrices = {
+  BTC: 60750.23,
+  ETH: 3410.75,
+  SOL: 152.12,
+  ADA: 0.437,
+  XRP: 0.52,
+};
 
 export default function Header() {
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [prices, setPrices] = useState(dummyPrices);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPrices((prev) => {
+        const updated = { ...prev };
+        for (let coin in updated) {
+          let change = (Math.random() * 2 - 1).toFixed(2);
+          updated[coin] = +(updated[coin] + parseFloat(change)).toFixed(2);
+        }
+        return updated;
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-[#0c0f2f] to-[#000000] border-b border-purple-900/20 shadow-md backdrop-blur-lg">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <motion.header
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="w-full px-6 py-4 backdrop-blur-lg bg-black/60 border-b border-white/10 shadow-lg sticky top-0 z-50"
+    >
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-extrabold tracking-widest text-cyan-400 drop-shadow-md">
-          <span className="text-purple-500">Crypto</span>
-          <span className="text-white">Trade</span>
-          <span className="text-cyan-400">.pro</span>
-        </Link>
+        <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-green-300 to-yellow-400 animate-pulse">
+          ⚡CryptoLive
+        </h1>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <motion.div key={link} whileHover={{ scale: 1.1 }} className="group relative">
-              <Link
-                href={`/${link.toLowerCase()}`}
-                className="text-white font-medium transition hover:text-cyan-400"
-              >
-                {link}
-                <span className="block w-0 h-[2px] bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
-              </Link>
-            </motion.div>
-          ))}
-
-          <Link
-            href="/buy"
-            className="px-4 py-2 rounded-md bg-gradient-to-br from-green-400 to-emerald-600 text-black font-semibold shadow hover:scale-105 transition"
-          >
-            Buy
-          </Link>
-          <Link
-            href="/sell"
-            className="px-4 py-2 rounded-md bg-gradient-to-br from-pink-500 to-red-600 text-white font-semibold shadow hover:scale-105 transition"
-          >
-            Sell
-          </Link>
-        </nav>
-
-        {/* Mobile Toggle */}
-        <div className="md:hidden text-white">
-          <button onClick={() => setIsMobileOpen(!isMobileOpen)}>
-            {isMobileOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMobileOpen && (
-        <div className="md:hidden bg-[#0d0d1f] border-t border-purple-800/30 px-6 py-4 space-y-4">
-          {navLinks.map((link) => (
+        {/* Navigation */}
+        <nav className="flex gap-6 text-sm font-semibold tracking-wide">
+          {["Home", "Trade", "Portfolio", "History"].map((text) => (
             <Link
-              key={link}
-              href={`/${link.toLowerCase()}`}
-              className="block text-white text-lg hover:text-cyan-400"
-              onClick={() => setIsMobileOpen(false)}
+              key={text}
+              href={`/${text.toLowerCase()}`}
+              className="relative group text-white hover:text-green-300 transition"
             >
-              {link}
+              {text}
+              <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-green-300 transition-all group-hover:w-full"></span>
             </Link>
           ))}
-          <Link
-            href="/buy"
-            className="block bg-green-400 text-black px-4 py-2 rounded-md font-semibold"
-            onClick={() => setIsMobileOpen(false)}
-          >
-            Buy
-          </Link>
-          <Link
-            href="/sell"
-            className="block bg-red-600 text-white px-4 py-2 rounded-md font-semibold"
-            onClick={() => setIsMobileOpen(false)}
-          >
-            Sell
-          </Link>
-        </div>
-      )}
-    </header>
+        </nav>
+
+        {/* Live Ticker */}
+        <motion.div
+          initial={{ x: "100%" }}
+          animate={{ x: "-100%" }}
+          transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+          className="whitespace-nowrap text-sm text-gray-300 overflow-hidden w-full sm:w-auto"
+        >
+          {coins.map((coin) => (
+            <span key={coin} className="mx-4">
+              {coin}: <span className="text-green-400">${prices[coin]}</span>
+            </span>
+          ))}
+        </motion.div>
+      </div>
+    </motion.header>
   );
 }
